@@ -4,10 +4,11 @@ RUN apt-get update && apt-get install -y g++
 
 WORKDIR /app
 
-COPY app.cpp .
+COPY server.cpp .
 
-RUN g++ app.cpp -o app
+RUN g++ server.cpp -o server
 
 EXPOSE 8080
 
-CMD ["./app"]
+CMD ["./server"]
+
