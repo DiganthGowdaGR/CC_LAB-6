@@ -16,8 +16,14 @@ pipeline {
                 sh '''
                 docker network create app-network || true
                 docker rm -f backend1 backend2 || true
-                docker run -d --name backend1 --network app-network backend-app
-                docker run -d --name backend2 --network app-network backend-app
+
+                docker run -d --name backend1 \
+                --network app-network \
+                -p 8081:8080 backend-app
+
+                docker run -d --name backend2 \
+                --network app-network \
+                -p 8082:8080 backend-app
                 '''
             }
         }
@@ -30,22 +36,13 @@ pipeline {
                 docker run -d \
                   --name nginx-lb \
                   --network app-network \
-                  -p 80:80 \
-                  nginx
+                  -p 80:80 nginx
 
                 docker cp nginx/default.conf nginx-lb:/etc/nginx/conf.d/default.conf
+
                 docker exec nginx-lb nginx -s reload
                 '''
             }
-        }
-    }
-
-    post {
-        success {
-            echo 'Pipeline executed successfully. NGINX load balancer is running.'
-        }
-        failure {
-            echo 'Pipeline failed. Check console logs for errors.'
         }
     }
 }
